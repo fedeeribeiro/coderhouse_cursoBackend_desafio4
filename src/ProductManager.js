@@ -27,6 +27,7 @@ export default class ProductManager {
     } 
 
     async addProduct(title, description, price, thumbnail, code, stock, category, status){
+        console.log(title, description, price, thumbnail, code, stock, category, status);
         if(!title || !description || !price || !code || !stock || !category || !status){
             console.log('Error. No se pueden dejar campos vacíos al agregar un nuevo producto.')
         }else if(await this.#isCodeInUse(code)){
@@ -37,16 +38,17 @@ export default class ProductManager {
                 title,
                 description,
                 price,
-                thumbnail: [],
+                thumbnail: [thumbnail],
                 code,
                 stock,
                 category,
-                status
+                status: true
             }
             const productsArray = await this.getProducts();
             productsArray.push(product);
             await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
             console.log('Se ha agregado el producto exitosamente.')
+            return product
         }
     }
 
@@ -67,7 +69,7 @@ export default class ProductManager {
     async getProductById(id){
         const productsArray = await this.getProducts();
         const productFound = productsArray.find(product => product.id === id);
-        if (!productFound) console.log('Error. Not found.')
+        if (!productFound) console.log('Error. Producto no encontrado.')
         else return productFound
     }
 
@@ -77,26 +79,47 @@ export default class ProductManager {
         if(productFound){
             if(prop === 'title'){
                 productFound.title = value;
-                console.log('Se ha actualizado el producto exitosamente.')
+                await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
+                console.log('Se ha actualizado el producto exitosamente.');
+                return productFound
             }else if(prop === 'description'){
                 productFound.description = value;
-                console.log('Se ha actualizado el producto exitosamente.')
+                await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
+                console.log('Se ha actualizado el producto exitosamente.');
+                return productFound
             }else if(prop === 'price'){
                 productFound.price = value;
-                console.log('Se ha actualizado el producto exitosamente.')
+                await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
+                console.log('Se ha actualizado el producto exitosamente.');
+                return productFound
             }else if(prop === 'thumbnail'){
-                productFound.thumbnail = value;
-                console.log('Se ha actualizado el producto exitosamente.')
+                productFound.thumbnail.push(value);
+                await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
+                console.log('Se ha actualizado el producto exitosamente.');
+                return productFound
             }else if(prop === 'code'){
                 productFound.code = value;
-                console.log('Se ha actualizado el producto exitosamente.')
+                await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
+                console.log('Se ha actualizado el producto exitosamente.');
+                return productFound
             }else if(prop === 'stock'){
-                productFound = value;
-                console.log('Se ha actualizado el producto exitosamente.')
+                productFound.stock = value;
+                await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
+                console.log('Se ha actualizado el producto exitosamente.');
+                return productFound
+            }else if(prop === 'category'){
+                productFound.category = value;
+                await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
+                console.log('Se ha actualizado el producto exitosamente.');
+                return productFound
+            }else if(prop === 'status'){
+                productFound.status = value;
+                await fs.promises.writeFile(this.path, JSON.stringify(productsArray));
+                console.log('Se ha actualizado el producto exitosamente.');
+                return productFound
             }else{
                 console.log('Error. Se ha ingresado una propiedad no válida.')
             }
-            await fs.promises.writeFile(this.path, JSON.stringify(productsArray))
         }else{
             console.log('Error. No se ha encontrado ningún producto con el id ingresado.')
         }
@@ -106,8 +129,9 @@ export default class ProductManager {
         const productsArray = await this.getProducts();
         if(productsArray.find(product => product.id === id)){
             const newProductsArray = productsArray.filter(product => product.id !== id);
-            await fs.promises.writeFile(this.path, JSON.stringify(newProductsArray))
-            console.log('Se ha eliminado el producto exitosamente.')
+            await fs.promises.writeFile(this.path, JSON.stringify(newProductsArray));
+            console.log('Se ha eliminado el producto exitosamente.');
+            return true
         }else{
             console.log('Error. No se ha encontrado ningún producto con el id ingresado.')
         }
