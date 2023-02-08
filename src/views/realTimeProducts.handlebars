@@ -1,0 +1,20 @@
+<h2>PRODUCTS</h2>
+
+{{#each products}}
+
+    <p> ID: {{id}} - TITLE: {{title}} - DESCRIPTION: {{description}} - PRICE: {{price}} - STATUS: {{status}} - CODE: {{code}} - STOCK:{{stock}}</p>
+
+{{/each}}
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socketClient = io();
+    socketClient.on("addedProduct", (products) => {
+        console.log("Se ha agregado un producto.");
+        window.location.reload()
+    });
+    socketClient.on("deletedProduct", (products) => {
+        console.log("Se ha eliminado un producto.");
+        window.location.reload()
+    })
+</script>
