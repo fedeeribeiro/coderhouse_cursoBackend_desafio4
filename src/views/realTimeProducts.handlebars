@@ -1,20 +1,84 @@
-<h2>PRODUCTS</h2>
+<h2>Agregar un producto</h2>
 
-{{#each products}}
+<form id="add-product-form">
+    <label for="title">Nombre:</label>
+    <input type="text" id="title" name="title">
 
-    <p> ID: {{id}} - TITLE: {{title}} - DESCRIPTION: {{description}} - PRICE: {{price}} - STATUS: {{status}} - CODE: {{code}} - STOCK:{{stock}}</p>
+    <label for="description">Descripción:</label>
+    <input type="text" id="description" name="description">
 
-{{/each}}
+    <label for="price">Precio:</label>
+    <input type="number" id="price" name="price">
+
+    <label for="stock">Stock:</label>
+    <input type="number" id="stock" name="stock">
+
+    <label for="code">Code:</label>
+    <input type="text" id="code" name="code">
+
+    <label for="category">Categoría:</label>
+    <input type="text" id="category" name="category">
+
+    <label for="thumbnail">URL de la imagen:</label>
+    <input type="text" id="thumbnail" name="thumbnail">
+
+    <button type="submit">Agregar producto</button>
+</form>
+
+<h2>Eliminar un producto</h2>
+
+<form id="delete-product-form">
+    <label for="id">ID del producto a eliminar:</label>
+    <input type="number" id="id" name="id">
+
+    <button type="submit">Eliminar producto</button>
+</form>
+
+<h2>LISTA DE PRODUCTOS</h2>
+
+<div id='real-time-products'></div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socketClient = io();
-    socketClient.on("addedProduct", (products) => {
-        console.log("Se ha agregado un producto.");
-        window.location.reload()
+
+    const productsContainer = document.getElementById('real-time-products-list');
+    const addProductForm = document.getElementById('add-product-form');
+    const deleteProductForm = document.getElementById('delete-product-form');
+
+    addProductForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(addProductForm);
+        fetch('/api/products/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        socketClient.emit('updateProducts')
     });
-    socketClient.on("deletedProduct", (products) => {
-        console.log("Se ha eliminado un producto.");
-        window.location.reload()
+
+    deleteProductForm.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const formData = new FormData(deleteProductForm);
+        let productId = formData.id;
+
+        fetch(`/api/products/${productId.toString()}`, {
+            method: 'DELETE',
+        })
+        .then(response => response.json())
+        socketClient.emit('updateProducts')
+    });
+
+    socketClient.on('fetchProducts', () => {
+        fetch('/api/products/', {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(products => {
+            let productList = products.map(product => {
+                return `<p>ID: ${product.id} - TITLE: ${product.title} - DESCRIPTION: ${product.description} - PRICE: ${product.price} - STATUS: ${product.status} - CODE: ${product.code} - STOCK: ${product.stock}</p>`
+            }).join(' ');
+            productsContainer.innerHTML = productList
+        })
     })
 </script>
