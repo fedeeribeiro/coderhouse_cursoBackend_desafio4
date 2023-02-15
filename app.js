@@ -25,7 +25,7 @@ const httpServer = app.listen(PORT, () => {
     console.log(`Servidor escuchando al puerto ${PORT}.`)
 });
 
-export const socketServer = new Server(httpServer);
+const socketServer = new Server(httpServer);
 
 socketServer.on('connection', (socket) => {
     console.log(`Usuario conectado con el ID ${socket.id}.`);
@@ -34,6 +34,6 @@ socketServer.on('connection', (socket) => {
         socket.emit('fetchProducts')
     });
     socket.on('disconnect', () => {
-        console.log('Usuario desconectado.')
+        console.log(`Usuario con ID ${socket.id} se ha desconectado.`)
     })
 })

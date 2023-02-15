@@ -10,7 +10,7 @@ router.get('/', async (request, response) => {
     response.render('home', { products })
 });
 
-router.get('/realTimeProducts', async (request, response) => {
+router.get('/realTimeProducts', (request, response) => {
     response.render('realTimeProducts')
 });
 
